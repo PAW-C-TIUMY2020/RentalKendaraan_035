@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace RentalKendaraan_201810140035.Models
 {
     public partial class Pengembalian
     {
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
         public int IdPengembalian { get; set; }
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
+
+        [Required(ErrorMessage = "Tanggal pengembalian tidak boleh kosong!!")]
         public DateTime? TglPengembalian { get; set; }
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
-        public int? IdPemimjaman { get; set; }
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
+
+        [Required(ErrorMessage = "Peminjaman tidak boleh kosong!!")]
+        public int? IdPeminjaman { get; set; }
+
+        [Required(ErrorMessage = "Kondisi tidak boleh kosong!!")]
         public int? IdKondisi { get; set; }
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
+
+        [Required(ErrorMessage = "Denda tidak boleh kosong!!")]
         public int? Denda { get; set; }
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
-        public Peminjaman IdPengembalian1 { get; set; }
-        [Required(ErrorMessage = "wajib di isi dengan angka")]
-        public KondisiKendaraan IdPengembalianNavigation { get; set; }
+
+        [DisplayName("Kondisi")]
+        public KondisiKendaraan IdKondisiNavigation { get; set; }
+
+        [DisplayName("Peminjaman")]
+        public Peminjaman IdPeminjamanNavigation { get; set; }
     }
 }

@@ -1,13 +1,10 @@
-﻿@model RentalKendaraan_201810140035.Models.JnsKendaraan
-
+﻿@model RentalKendaraan_201810140035.Models.JenisKendaraan
 @{
     ViewData["Title"] = "Details";
 }
-
 <h2>Details</h2>
-
 <div>
-    <h4>JnsKendaraan</h4>
+    <h4>JenisKendaraan</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -16,15 +13,9 @@
         <dd>
             @Html.DisplayFor(model => model.NamaJenisKendaraan)
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.JenisKendaraanNavigation)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.JenisKendaraanNavigation.IdKendaraan)
-        </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.JenisKendaraan">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.IdJenisKendaraan">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

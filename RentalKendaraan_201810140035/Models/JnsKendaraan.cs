@@ -4,13 +4,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RentalKendaraan_201810140035.Models
 {
-    public partial class JnsKendaraan
+    public partial class JenisKendaraan
     {
-        [Required(ErrorMessage = "jenis kendaraan tidak boleh kosong")]
-        public int JenisKendaraan { get; set; }
-        [Required(ErrorMessage = "Nama jenis kendaraan tidak boleh kosong")]
+        public JenisKendaraan()
+        {
+            Kendaraan = new HashSet<Kendaraan>();
+        }
+
+        public int IdJenisKendaraan { get; set; }
+
+        [Required(ErrorMessage = "Nama Jenis Kendaraan tidak boleh kosong!!")]
         public string NamaJenisKendaraan { get; set; }
 
-        public Kendaraan JenisKendaraanNavigation { get; set; }
+        public ICollection<Kendaraan> Kendaraan { get; set; }
     }
 }

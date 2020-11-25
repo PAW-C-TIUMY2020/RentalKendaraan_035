@@ -1,11 +1,8 @@
 ﻿@model RentalKendaraan_201810140035.Models.Customer
-
 @{
     ViewData["Title"] = "Details";
 }
-
 <h2>Details</h2>
-
 <div>
     <h4>Customer</h4>
     <hr />
@@ -35,16 +32,10 @@
             @Html.DisplayFor(model => model.NoHp)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.IdGender)
+            @Html.DisplayNameFor(model => model.IdGenderNavigation)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.IdGender)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.IdCustomerNavigation)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.IdCustomerNavigation.IdGender)
+            @Html.DisplayFor(model => model.IdGenderNavigation.IdGender)
         </dd>
     </dl>
 </div>

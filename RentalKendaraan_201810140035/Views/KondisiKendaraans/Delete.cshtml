@@ -1,11 +1,8 @@
 ﻿@model RentalKendaraan_201810140035.Models.KondisiKendaraan
-
 @{
     ViewData["Title"] = "Delete";
 }
-
 <h2>Delete</h2>
-
 <h3>Are you sure you want to delete this?</h3>
 <div>
     <h4>KondisiKendaraan</h4>
@@ -18,7 +15,7 @@
             @Html.DisplayFor(model => model.NamaKondisi)
         </dd>
     </dl>
-    
+
     <form asp-action="Delete">
         <input type="hidden" asp-for="IdKondisi" />
         <input type="submit" value="Delete" class="btn btn-default" /> |

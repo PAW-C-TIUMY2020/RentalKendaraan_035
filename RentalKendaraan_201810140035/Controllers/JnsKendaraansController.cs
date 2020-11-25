@@ -7,25 +7,81 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RentalKendaraan_201810140035.Models;
 
+
 namespace RentalKendaraan_201810140035.Controllers
 {
-    public class JnsKendaraansController : Controller
+    public class JenisKendaraansController : Controller
     {
         private readonly RentKendaraanContext _context;
 
-        public JnsKendaraansController(RentKendaraanContext context)
+        public JenisKendaraansController(RentKendaraanContext context)
         {
             _context = context;
         }
 
-        // GET: JnsKendaraans
-        public async Task<IActionResult> Index()
+        // GET: JenisKendaraans
+        public async Task<IActionResult> Index(string ktsd, string searchString, string sortOrder, string currentFilter, int? pageNumber)
         {
-            var rentKendaraanContext = _context.JnsKendaraan.Include(j => j.JenisKendaraanNavigation);
-            return View(await rentKendaraanContext.ToListAsync());
+            //buat list menyimpan ketersediaan
+            var ktsdList = new List<string>();
+            //Query mengambil data
+            var ktsdQuery = from d in _context.JenisKendaraan orderby d.NamaJenisKendaraan select d.NamaJenisKendaraan;
+
+            ktsdList.AddRange(ktsdQuery.Distinct());
+
+            //untuk menampilkan di view
+            ViewBag.ktsd = new SelectList(ktsdList);
+
+            //panggil db context
+            var menu = from m in _context.JenisKendaraan select m;
+
+            //untuk memilih dropdownlist ketersediaan
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.NamaJenisKendaraan == ktsd);
+            }
+
+            //untuk search data
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                menu = menu.Where(s => s.NamaJenisKendaraan.Contains(searchString));
+            }
+
+            //untuk sorting
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    menu = menu.OrderByDescending(s => s.NamaJenisKendaraan);
+                    break;
+                default:
+                    menu = menu.OrderBy(s => s.NamaJenisKendaraan);
+                    break;
+            }
+
+            //membuat pagedList
+            ViewData["CurrentSort"] = sortOrder;
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            //definisi jumlah data pada halaman
+            int pageSize = 5;
+
+            return View(await PaginatedList<JenisKendaraan>.CreateAsync(menu.AsNoTracking(), pageNumber ?? 1, pageSize));
+            //return View(await _context.JenisKendaraan.ToListAsync());
         }
 
-        // GET: JnsKendaraans/Details/5
+        // GET: JenisKendaraans/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,42 +89,39 @@ namespace RentalKendaraan_201810140035.Controllers
                 return NotFound();
             }
 
-            var jnsKendaraan = await _context.JnsKendaraan
-                .Include(j => j.JenisKendaraanNavigation)
-                .FirstOrDefaultAsync(m => m.JenisKendaraan == id);
-            if (jnsKendaraan == null)
+            var jenisKendaraan = await _context.JenisKendaraan
+                .FirstOrDefaultAsync(m => m.IdJenisKendaraan == id);
+            if (jenisKendaraan == null)
             {
                 return NotFound();
             }
 
-            return View(jnsKendaraan);
+            return View(jenisKendaraan);
         }
 
-        // GET: JnsKendaraans/Create
+        // GET: JenisKendaraans/Create
         public IActionResult Create()
         {
-            ViewData["JenisKendaraan"] = new SelectList(_context.Kendaraan, "IdKendaraan", "IdKendaraan");
             return View();
         }
 
-        // POST: JnsKendaraans/Create
+        // POST: JenisKendaraans/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("JenisKendaraan,NamaJenisKendaraan")] JnsKendaraan jnsKendaraan)
+        public async Task<IActionResult> Create([Bind("IdJenisKendaraan,NamaJenisKendaraan")] JenisKendaraan jenisKendaraan)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(jnsKendaraan);
+                _context.Add(jenisKendaraan);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["JenisKendaraan"] = new SelectList(_context.Kendaraan, "IdKendaraan", "IdKendaraan", jnsKendaraan.JenisKendaraan);
-            return View(jnsKendaraan);
+            return View(jenisKendaraan);
         }
 
-        // GET: JnsKendaraans/Edit/5
+        // GET: JenisKendaraans/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,23 +129,22 @@ namespace RentalKendaraan_201810140035.Controllers
                 return NotFound();
             }
 
-            var jnsKendaraan = await _context.JnsKendaraan.FindAsync(id);
-            if (jnsKendaraan == null)
+            var jenisKendaraan = await _context.JenisKendaraan.FindAsync(id);
+            if (jenisKendaraan == null)
             {
                 return NotFound();
             }
-            ViewData["JenisKendaraan"] = new SelectList(_context.Kendaraan, "IdKendaraan", "IdKendaraan", jnsKendaraan.JenisKendaraan);
-            return View(jnsKendaraan);
+            return View(jenisKendaraan);
         }
 
-        // POST: JnsKendaraans/Edit/5
+        // POST: JenisKendaraans/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("JenisKendaraan,NamaJenisKendaraan")] JnsKendaraan jnsKendaraan)
+        public async Task<IActionResult> Edit(int id, [Bind("IdJenisKendaraan,NamaJenisKendaraan")] JenisKendaraan jenisKendaraan)
         {
-            if (id != jnsKendaraan.JenisKendaraan)
+            if (id != jenisKendaraan.IdJenisKendaraan)
             {
                 return NotFound();
             }
@@ -101,12 +153,12 @@ namespace RentalKendaraan_201810140035.Controllers
             {
                 try
                 {
-                    _context.Update(jnsKendaraan);
+                    _context.Update(jenisKendaraan);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!JnsKendaraanExists(jnsKendaraan.JenisKendaraan))
+                    if (!JenisKendaraanExists(jenisKendaraan.IdJenisKendaraan))
                     {
                         return NotFound();
                     }
@@ -117,11 +169,10 @@ namespace RentalKendaraan_201810140035.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["JenisKendaraan"] = new SelectList(_context.Kendaraan, "IdKendaraan", "IdKendaraan", jnsKendaraan.JenisKendaraan);
-            return View(jnsKendaraan);
+            return View(jenisKendaraan);
         }
 
-        // GET: JnsKendaraans/Delete/5
+        // GET: JenisKendaraans/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,31 +180,30 @@ namespace RentalKendaraan_201810140035.Controllers
                 return NotFound();
             }
 
-            var jnsKendaraan = await _context.JnsKendaraan
-                .Include(j => j.JenisKendaraanNavigation)
-                .FirstOrDefaultAsync(m => m.JenisKendaraan == id);
-            if (jnsKendaraan == null)
+            var jenisKendaraan = await _context.JenisKendaraan
+                .FirstOrDefaultAsync(m => m.IdJenisKendaraan == id);
+            if (jenisKendaraan == null)
             {
                 return NotFound();
             }
 
-            return View(jnsKendaraan);
+            return View(jenisKendaraan);
         }
 
-        // POST: JnsKendaraans/Delete/5
+        // POST: JenisKendaraans/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var jnsKendaraan = await _context.JnsKendaraan.FindAsync(id);
-            _context.JnsKendaraan.Remove(jnsKendaraan);
+            var jenisKendaraan = await _context.JenisKendaraan.FindAsync(id);
+            _context.JenisKendaraan.Remove(jenisKendaraan);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool JnsKendaraanExists(int id)
+        private bool JenisKendaraanExists(int id)
         {
-            return _context.JnsKendaraan.Any(e => e.JenisKendaraan == id);
+            return _context.JenisKendaraan.Any(e => e.IdJenisKendaraan == id);
         }
     }
 }
